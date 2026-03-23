@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  background-color: black;
+  
 }
 
 .App-logo {
@@ -14,14 +16,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  background-color: chocolate;
+  min-height: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: beige;
 }
 
 .App-link {
@@ -36,3 +38,94 @@
     transform: rotate(360deg);
   }
 }
+.title{
+  text-align: center;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  margin: 10px 0 30px 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+.form{
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 7px;
+  margin-top: 1px;
+ 
+}
+.input{
+  border-radius: 50px;
+  border: 1px solid #c0c0c0;
+  outline: 0 !important;
+  box-sizing: border-box;
+  padding: 10px;
+  margin-bottom: 2px;
+  margin-top: 1px;
+
+}
+
+.form-btn{
+  padding: 10px;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  border-radius: 20px;
+  border: 0 !important;
+  outline: 0 !important;
+  background: teal;
+  color: white;
+  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  margin-left: 300px;
+  margin-right: 300px;
+  margin-bottom: 2px;
+}
+.sign-up-link {
+  margin-left: 1px;
+  font-size: 11px;
+  text-decoration: underline;
+  text-decoration-color: teal;
+  color: teal;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+.word{
+  color: turquoise;
+}
+.product_img{
+  object-fit: contain;
+  width: 100%;
+  height: 300px;
+  margin-bottom: 2px;
+  
+}
+.input2{
+  border-radius: 50px;
+  padding: 10px;
+  margin-bottom: 1px;
+  margin-top: 2px;
+  margin-left: 1px;
+  margin-right: 1px;
+  border: 1px solid #c0c0c0;
+  outline: 0 !important;
+  box-sizing: border-box;
+}
+.sign-in{
+  margin-left: 1px;
+  font-size: 20px;
+  text-decoration: underline;
+  text-decoration-color: teal;
+  color: teal;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+        
+}
+
+
+/* Navbar.css */
+

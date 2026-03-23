@@ -1,0 +1,113 @@
+.navbar {
+  width: 100%;
+  background: linear-gradient(90deg, #ff7e5f, #feb47b);
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo a {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.nav-links a::after {
+  content: '';
+  display: block;
+  height: 2px;
+  width: 0;
+  background: white;
+  transition: width 0.3s;
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.nav-links a.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.bar {
+  height: 3px;
+  width: 25px;
+  background-color: white;
+  transition: all 0.3s;
+  border-radius: 2px;
+}
+
+/* Hamburger animations */
+.animate-bar1 {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.animate-bar2 {
+  opacity: 0;
+}
+
+.animate-bar3 {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: linear-gradient(90deg, #ff7e5f, #feb47b);
+    flex-direction: column;
+    width: 200px;
+    padding: 15px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    gap: 15px;
+    border-radius: 5px 0 0 5px;
+  }
+
+  .nav-links.open {
+    transform: translateX(0);
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
