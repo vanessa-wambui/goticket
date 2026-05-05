@@ -4,13 +4,15 @@ import Loader from './Loader';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import Mycarousel from './Mycarousel';
-import { useCart } from './CartContext'; // <-- IMPORT CONTEXT
+import { useCart } from './CartContext';
+import Chatbot from './Chatbot';
 
 const Getproducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { addToCart } = useCart(); // <-- HOOK INTO CART
+  const [chatOpen, setChatOpen] = useState(false);
+  const { addToCart } = useCart();
 
   const navigate = useNavigate();
   const img_url = "https://vanessawambui.alwaysdata.net/static/images/";
@@ -46,14 +48,30 @@ const Getproducts = () => {
     price: { color: '#f5c518', fontSize: '22px', fontWeight: '800', margin: '0' },
     btnGroup: { display: 'flex', gap: '10px' },
     btnPrimary: { backgroundColor: '#f5c518', color: '#000', border: 'none', borderRadius: '8px', padding: '10px 16px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', letterSpacing: '0.5px' },
-    btnSecondary: { backgroundColor: 'transparent', color: '#f5c518', border: '1px solid #f5c518', borderRadius: '8px', padding: '10px 16px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', letterSpacing: '0.5px' }
+    btnSecondary: { backgroundColor: 'transparent', color: '#f5c518', border: '1px solid #f5c518', borderRadius: '8px', padding: '10px 16px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', letterSpacing: '0.5px' },
+    floatingBtn: {
+      position: 'fixed', bottom: '24px', left: '24px',
+      width: '58px', height: '58px', borderRadius: '50%',
+      background: 'linear-gradient(135deg, #F5C518, #D4A017)',
+      border: 'none', cursor: 'pointer',
+      boxShadow: '0 4px 20px rgba(245,197,24,0.5), 0 2px 8px rgba(0,0,0,0.4)',
+      zIndex: 9998, display: 'flex', alignItems: 'center',
+      justifyContent: 'center', fontSize: '26px',
+      transition: 'transform 0.2s, box-shadow 0.2s',
+    },
+    pulseRing: {
+      position: 'fixed', bottom: '24px', left: '24px',
+      width: '58px', height: '58px', borderRadius: '50%',
+      background: 'rgba(245,197,24,0.25)', zIndex: 9997,
+      animation: 'pulseRing 2s ease-out infinite', pointerEvents: 'none',
+    },
   };
 
   return (
     <div style={styles.pageBg}>
       <Mycarousel />
       <div style={styles.container}>
-        <h3 style={styles.heading}>Available Products</h3>
+        
         {loading && <Loader />}
         <h4 style={styles.error}>{error}</h4>
 
@@ -80,9 +98,7 @@ const Getproducts = () => {
                 <div style={styles.bottomRow}>
                   <h4 style={styles.price}>KES {product.product_cost}</h4>
                   <div style={styles.btnGroup}>
-                    {/* NEW ADD TO CART BUTTON */}
                     <button style={styles.btnSecondary} onClick={() => addToCart(product)}>Add to Cart</button>
-                    
                     <button style={styles.btnPrimary} onClick={() => navigate("/makepayment", { state: { product } })}>
                       Buy Now
                     </button>
@@ -94,6 +110,40 @@ const Getproducts = () => {
         </div>
       </div>
       <Footer />
+
+      {/* Chatbot */}
+      {chatOpen && <Chatbot onClose={() => setChatOpen(false)} />}
+
+      {/* Floating Chat Button */}
+      <button
+        onClick={() => setChatOpen((prev) => !prev)}
+        title="Chat with goTicket Assistant"
+        style={styles.floatingBtn}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.1)';
+          e.currentTarget.style.boxShadow = '0 6px 28px rgba(245,197,24,0.7), 0 2px 8px rgba(0,0,0,0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 20px rgba(245,197,24,0.5), 0 2px 8px rgba(0,0,0,0.4)';
+        }}
+      >
+        {chatOpen ? '✕' : '🎟️'}
+      </button>
+
+      {/* Pulse ring (only when chat is closed) */}
+      {!chatOpen && <span style={styles.pulseRing} />}
+
+      <style>{`
+        @keyframes pulseRing {
+          0%   { transform: scale(1);   opacity: 0.7; }
+          100% { transform: scale(1.7); opacity: 0;   }
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0);    }
+        }
+      `}</style>
     </div>
   );
 };

@@ -8,6 +8,7 @@ const SLIDES = [
     label: 'Live Tonight',
     heading: 'Concerts & Festivals',
     sub: "Front-row passes to Africa's biggest stages.",
+    tagline: 'Your ticket to the moment. Seamless booking, unforgettable experiences.',
     image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1400&q=80',
     alt: 'Concert stage with lights',
   },
@@ -16,6 +17,7 @@ const SLIDES = [
     label: 'Game Day',
     heading: 'Sports & Derby',
     sub: 'Catch every kick, every roar, every moment live.',
+    tagline: 'From the stands to your screen — goTicket puts you in the action.',
     image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1400&q=80',
     alt: 'Sports stadium packed with fans',
   },
@@ -24,6 +26,7 @@ const SLIDES = [
     label: 'Now Showing',
     heading: 'Movies & Premieres',
     sub: 'IMAX. Dolby. Opening night. Book your seat now.',
+    tagline: 'Reserve your seat in seconds. No queues. No hassle. Just show up.',
     image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1400&q=80',
     alt: 'Cinema interior with large screen',
   },
@@ -32,6 +35,7 @@ const SLIDES = [
     label: 'Escape Awaits',
     heading: 'Travel & Getaways',
     sub: 'Coastal retreats and safari adventures — sorted.',
+    tagline: 'One platform. Every experience. Go further with goTicket.',
     image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80',
     alt: 'Scenic mountain travel destination',
   },
@@ -62,7 +66,6 @@ const Mycarousel = memo(() => (
         filter: brightness(0.45);
       }
 
-      /* Dark gradient over image */
       .gt-carousel .carousel-item::after {
         content: '';
         position: absolute;
@@ -76,7 +79,6 @@ const Mycarousel = memo(() => (
         pointer-events: none;
       }
 
-      /* Caption */
       .gt-caption {
         position: absolute;
         bottom: 0;
@@ -113,43 +115,35 @@ const Mycarousel = memo(() => (
         font-family: 'DM Sans', sans-serif;
         font-size: 1rem;
         color: rgba(240, 236, 226, 0.75);
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         max-width: 420px;
       }
 
-      .gt-btns {
+      .gt-tagline-wrapper {
         display: flex;
+        align-items: center;
         gap: 12px;
-        flex-wrap: wrap;
+        margin-top: 0.25rem;
       }
 
-      .gt-btn-primary {
-        font-family: 'DM Sans', sans-serif;
-        font-size: 0.9rem;
-        font-weight: 500;
-        padding: 0.65rem 1.75rem;
+      .gt-tagline-bar {
+        width: 36px;
+        height: 2px;
         background: #facc15;
-        color: #0b0f1a;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background 0.2s, transform 0.15s;
+        flex-shrink: 0;
+        border-radius: 2px;
       }
-      .gt-btn-primary:hover { background: #eab308; transform: translateY(-1px); }
 
-      .gt-btn-secondary {
+      .gt-tagline {
         font-family: 'DM Sans', sans-serif;
-        font-size: 0.9rem;
-        font-weight: 500;
-        padding: 0.65rem 1.75rem;
-        background: transparent;
-        color: #ffffff;
-        border: 1.5px solid rgba(255,255,255,0.5);
-        border-radius: 6px;
-        cursor: pointer;
-        transition: border-color 0.2s, transform 0.15s;
+        font-size: 0.92rem;
+        font-weight: 400;
+        color: rgba(250, 204, 21, 0.85);
+        letter-spacing: 0.02em;
+        line-height: 1.5;
+        font-style: italic;
+        margin: 0;
       }
-      .gt-btn-secondary:hover { border-color: #ffffff; transform: translateY(-1px); }
 
       /* Indicators */
       .gt-carousel .carousel-indicators {
@@ -241,9 +235,9 @@ const Mycarousel = memo(() => (
               <p className="gt-label">{s.label}</p>
               <h2 className="gt-heading">{s.heading}</h2>
               <p className="gt-sub">{s.sub}</p>
-              <div className="gt-btns">
-                <button className="gt-btn-primary">Book Tickets</button>
-                <button className="gt-btn-secondary">Explore Events</button>
+              <div className="gt-tagline-wrapper">
+                <span className="gt-tagline-bar" />
+                <p className="gt-tagline">{s.tagline}</p>
               </div>
             </div>
           </div>

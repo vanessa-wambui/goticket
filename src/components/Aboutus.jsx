@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import Footer from "./Footer";
 
 const SECTIONS = [
   {
@@ -189,7 +190,9 @@ const AboutUs = memo(() => (
         <Section key={section.id} section={section} />
       ))}
     </div>
+    <Footer/>
   </section>
+  
 ));
 
 export default AboutUs;
