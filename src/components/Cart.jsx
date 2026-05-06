@@ -66,23 +66,23 @@ const Cart = () => {
           {/* LEFT: Cart Items */}
           <div>
             {cartItems.map((item) => (
-              <div style={styles.card} key={item.id}>
-                <div style={styles.itemFlex}>
-                  <img src={img_url + item.product_photo} alt={item.product_name} style={styles.img} />
-                  <div style={styles.itemDetails}>
-                    <h3 style={styles.itemTitle}>{item.product_name}</h3>
-                    <p style={styles.itemBasePrice}>KES {item.product_cost} / ticket</p>
-                    
-                    <div style={styles.counterContainer}>
-                      <button style={styles.counterBtn} onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
-                      <span style={styles.countText}>{item.quantity}</span>
-                      <button style={styles.counterBtn} onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
-                    </div>
-                    <button style={styles.deleteBtn} onClick={() => removeFromCart(item.id)}>Remove Item</button>
-                  </div>
-                </div>
-              </div>
-            ))}
+  <div style={styles.card} key={item.uniqueId}>
+    <div style={styles.itemFlex}>
+      <img src={img_url + item.product_photo} alt={item.product_name} style={styles.img} />
+      <div style={styles.itemDetails}>
+        <h3 style={styles.itemTitle}>{item.product_name}</h3>
+        <p style={styles.itemBasePrice}>KES {item.product_cost} / ticket</p>
+        
+        <div style={styles.counterContainer}>
+          <button style={styles.counterBtn} onClick={() => updateQuantity(item.uniqueId, item.quantity - 1)}>-</button>
+          <span style={styles.countText}>{item.quantity}</span>
+          <button style={styles.counterBtn} onClick={() => updateQuantity(item.uniqueId, item.quantity + 1)}>+</button>
+        </div>
+        <button style={styles.deleteBtn} onClick={() => removeFromCart(item.uniqueId)}>Remove Item</button>
+      </div>
+    </div>
+  </div>
+))}
           </div>
 
           {/* RIGHT: Summary */}

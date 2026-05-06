@@ -14,6 +14,8 @@ import Aboutus from './components/Aboutus';
 // --- NEW IMPORTS FOR CART FUNCTIONALITY ---
 import { CartProvider } from './components/CartContext';
 import Cart from './components/Cart';
+import Shop from './components/Shop';
+import Additem from './components/Additem';
 
 
 function App() {
@@ -33,6 +35,8 @@ function App() {
             <Route path='/addproducts' element={<Addproducts />} />
             <Route path='/makepayment' element={<Makepayment />} />
             <Route path='/aboutus' element={<Aboutus />} />
+            <Route path='/shop' element={<Shop/>} />
+            <Route path='/additem' element={<Additem/>} />
             
             {/* 2. ADD THE NEW CART ROUTE */}
             <Route path='/cart' element={<Cart />} />
