@@ -1,0 +1,166 @@
+import React, { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import Loader from './Loader'
+import axios from 'axios'
+
+const MakeOrderPayment = () => {
+
+  const { item } = useLocation().state || {}
+  const navigate = useNavigate()
+  const img_url = "https://vanessawambui.alwaysdata.net/static/images/"
+
+  const [number, setNumber] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState("")
+  const [error, setError] = useState("")
+  const [itemCount, setItemCount] = useState(1)
+
+  const totalCost = itemCount * Number(item.item_cost)
+
+  const handlesubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+
+    const user = JSON.parse(localStorage.getItem("user"))
+
+    try {
+      // Step 1: Trigger M-Pesa payment
+      const formdata = new FormData()
+      formdata.append("phone", number)
+      formdata.append("amount", totalCost)
+
+      const response = await axios.post(
+        "https://vanessawambui.alwaysdata.net/api/mpesa_payment",
+        formdata
+      )
+
+      // Step 2: Save the order to the database
+      const orderData = new FormData()
+      orderData.append("user_id", user.user_id)
+      orderData.append("item_id", item.item_id)
+      orderData.append("item_name", item.item_name)
+      orderData.append("item_cost", item.item_cost)
+      orderData.append("phone", number)
+      orderData.append("quantity", itemCount)
+
+      await axios.post(
+        "https://vanessawambui.alwaysdata.net/api/place_order",
+        orderData
+      )
+
+      setLoading(false)
+      setSuccess(response.data.message)
+    } catch (err) {
+      setLoading(false)
+      setError(err.message)
+    }
+  }
+
+  const styles = {
+    pageBg: { backgroundColor: '#0d0d0d', minHeight: '100vh', padding: '40px 20px' },
+    container: { maxWidth: '900px', margin: '0 auto' },
+    backBtn: { backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', color: '#fff', borderRadius: '50%', width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '20px', marginBottom: '30px', transition: 'border-color 0.3s ease' },
+    grid: { display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '30px', alignItems: 'start' },
+    card: { backgroundColor: '#1a1a1a', borderRadius: '16px', border: '1px solid #2a2a2a', padding: '24px' },
+    img: { width: '100%', height: '220px', objectFit: 'cover', borderRadius: '12px', marginBottom: '20px' },
+    productTitle: { color: '#fff', fontSize: '22px', fontWeight: '700', margin: '0 0 8px 0' },
+    productDesc: { color: '#888', fontSize: '14px', margin: '0 0 16px 0' },
+    basePrice: { color: '#aaa', fontSize: '16px', margin: '0 0 20px 0' },
+    counterContainer: { display: 'flex', alignItems: 'center', gap: '15px', borderTop: '1px solid #2a2a2a', paddingTop: '20px' },
+    counterBtn: { backgroundColor: '#2a2a2a', border: '1px solid #333', color: '#fff', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '18px', fontWeight: 'bold' },
+    countText: { color: '#fff', fontSize: '18px', fontWeight: '600', minWidth: '20px', textAlign: 'center' },
+    summaryTitle: { color: '#fff', fontSize: '20px', fontWeight: '600', margin: '0 0 30px 0', paddingBottom: '15px', borderBottom: '1px solid #2a2a2a' },
+    summaryRow: { display: 'flex', justifyContent: 'space-between', marginBottom: '15px' },
+    summaryLabel: { color: '#888', fontSize: '15px', margin: '0' },
+    summaryValue: { color: '#fff', fontSize: '15px', fontWeight: '600', margin: '0' },
+    totalRow: { display: 'flex', justifyContent: 'space-between', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #2a2a2a' },
+    totalValue: { color: '#f5c518', fontSize: '22px', fontWeight: '800', margin: '0' },
+    inputLabel: { color: '#888', fontSize: '12px', fontWeight: '600', letterSpacing: '1px', display: 'block', marginBottom: '8px', marginTop: '30px' },
+    input: { backgroundColor: '#2a2a2a', border: '1px solid #3a3a3a', color: '#fff', borderRadius: '8px', padding: '14px 16px', width: '100%', fontSize: '16px', outline: 'none' },
+    payBtn: { backgroundColor: '#f5c518', color: '#000', border: 'none', borderRadius: '8px', padding: '16px', width: '100%', fontSize: '16px', fontWeight: '700', cursor: 'pointer', marginTop: '20px', letterSpacing: '0.5px' },
+    successMsg: { color: '#4caf50', fontSize: '14px', textAlign: 'center', marginTop: '15px', marginBottom: '0' },
+    errorMsg: { color: '#f44336', fontSize: '14px', textAlign: 'center', marginTop: '15px', marginBottom: '0' }
+  }
+
+  return (
+    <div style={styles.pageBg}>
+      <div style={styles.container}>
+
+        <button
+          style={styles.backBtn}
+          onClick={() => navigate("/ourshop")}
+          onMouseOver={(e) => e.target.style.borderColor = '#f5c518'}
+          onMouseOut={(e) => e.target.style.borderColor = '#2a2a2a'}
+        >
+          ←
+        </button>
+
+        {loading && <Loader />}
+        {success && <h4 style={styles.successMsg}>{success}</h4>}
+        {error && <h4 style={styles.errorMsg}>{error}</h4>}
+
+        <div style={styles.grid}>
+
+          {/* LEFT: Item Details & Counter */}
+          <div style={styles.card}>
+            <img
+              src={img_url + item.item_photo}
+              alt={item.item_name}
+              style={styles.img}
+            />
+            <h3 style={styles.productTitle}>{item.item_name}</h3>
+            <p style={styles.productDesc}>{item.item_description}</p>
+            <p style={styles.basePrice}>KES {item.item_cost} / item</p>
+
+            <div style={styles.counterContainer}>
+              <button style={styles.counterBtn} onClick={() => setItemCount(prev => Math.max(1, prev - 1))}>-</button>
+              <span style={styles.countText}>{itemCount}</span>
+              <button style={styles.counterBtn} onClick={() => setItemCount(prev => prev + 1)}>+</button>
+            </div>
+          </div>
+
+          {/* RIGHT: Summary & Payment */}
+          <div style={styles.card}>
+            <h3 style={styles.summaryTitle}>Summary</h3>
+
+            <div style={styles.summaryRow}>
+              <p style={styles.summaryLabel}>Subtotal ({itemCount} item{itemCount > 1 ? 's' : ''})</p>
+              <p style={styles.summaryValue}>KES {totalCost.toLocaleString()}</p>
+            </div>
+
+            <div style={styles.totalRow}>
+              <p style={styles.summaryLabel} className='fw-bold'>Total</p>
+              <p style={styles.totalValue}>KES {totalCost.toLocaleString()}</p>
+            </div>
+
+            <form onSubmit={handlesubmit}>
+              <label style={styles.inputLabel}>M-PESA NUMBER</label>
+              <input
+                type="tel"
+                placeholder="0712 345 678"
+                style={styles.input}
+                required
+                value={number}
+                onChange={(e) => setNumber(e.target.value)}
+                onFocus={(e) => e.target.style.borderColor = '#f5c518'}
+                onBlur={(e) => e.target.style.borderColor = '#3a3a3a'}
+              />
+
+              <button
+                type="submit"
+                style={styles.payBtn}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#e6b800'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#f5c518'}
+              >
+                Pay with M-Pesa
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default MakeOrderPayment;

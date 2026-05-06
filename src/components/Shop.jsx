@@ -125,9 +125,9 @@ const Shop = () => {
                   <h4 style={styles.price}>KES {item.item_cost}</h4>
                   <div style={styles.btnGroup}>
                     <button style={styles.btnSecondary} onClick={() => addToCart(item)}>Add to Cart</button>
-                    <button style={styles.btnPrimary} onClick={() => navigate("/makepayment", { state: { product: item } })}>
-                      Buy Now
-                    </button>
+                    <button style={styles.btnPrimary} onClick={() => navigate("/makeorderpayment", { state: { item } })}>
+  Buy Now
+</button>
                   </div>
                 </div>
               </div>
