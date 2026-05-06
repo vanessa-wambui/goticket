@@ -9,29 +9,45 @@ const Makepayment = () => {
   const navigate = useNavigate()
   const img_url = "https://vanessawambui.alwaysdata.net/static/images/"
 
-  // Original Hooks
   const [number, setNumber] = useState("")
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState("")
   const [error, setError] = useState("")
-
-  // New Hook for Ticket Count
   const [ticketCount, setTicketCount] = useState(1)
   
-  // Calculate total cost dynamically
   const totalCost = ticketCount * product.product_cost
 
   const handlesubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
 
+    const user = JSON.parse(localStorage.getItem("user"))
+
     try {
       const formdata = new FormData()
       formdata.append("phone", number)
-      // Send the dynamically calculated total cost instead of the base price
-      formdata.append("amount", totalCost) 
+      formdata.append("amount", totalCost)
 
-      const response = await axios.post("https://kbenkamotho.alwaysdata.net/api/mpesa_payment", formdata)
+      // Step 1: Trigger M-Pesa payment
+      const response = await axios.post(
+        "https://vanessawambui.alwaysdata.net/api/mpesa_payment",
+        formdata
+      )
+
+      // Step 2: Save the ticket to the database
+      const ticketData = new FormData()
+      ticketData.append("user_id", user.user_id)
+      ticketData.append("product_id", product.product_id)
+      ticketData.append("product_name", product.product_name)
+      ticketData.append("product_date", product.product_date || "")
+      ticketData.append("amount_paid", totalCost)
+      ticketData.append("phone", number)
+      ticketData.append("quantity", ticketCount)
+
+      await axios.post(
+        "https://vanessawambui.alwaysdata.net/api/book_ticket",
+        ticketData
+      )
 
       setLoading(false)
       setSuccess(response.data.message)
@@ -41,7 +57,6 @@ const Makepayment = () => {
     }
   }
 
-  // --- CINEMATIC THEME STYLES ---
   const styles = {
     pageBg: {
       backgroundColor: '#0d0d0d',
@@ -130,7 +145,6 @@ const Makepayment = () => {
       minWidth: '20px',
       textAlign: 'center'
     },
-    // Right Side (Summary) Styles
     summaryTitle: {
       color: '#fff',
       fontSize: '20px',
@@ -219,9 +233,8 @@ const Makepayment = () => {
   return (
     <div style={styles.pageBg}>
       <div style={styles.container}>
-        
-        {/* Back Button Only */}
-        <button 
+
+        <button
           style={styles.backBtn}
           onClick={() => navigate("/")}
           onMouseOver={(e) => e.target.style.borderColor = '#f5c518'}
@@ -235,28 +248,27 @@ const Makepayment = () => {
         {error && <h4 style={styles.errorMsg}>{error}</h4>}
 
         <div style={styles.grid}>
-          
+
           {/* LEFT: Product Details & Counter */}
           <div style={styles.card}>
-            <img 
-              src={img_url + product.product_photo} 
-              alt={product.product_name} 
-              style={styles.img} 
+            <img
+              src={img_url + product.product_photo}
+              alt={product.product_name}
+              style={styles.img}
             />
             <h3 style={styles.productTitle}>{product.product_name}</h3>
             <p style={styles.productDesc}>{product.product_description}</p>
             <p style={styles.basePrice}>KES {product.product_cost} / ticket</p>
 
-            {/* Ticket Counter */}
             <div style={styles.counterContainer}>
-              <button 
+              <button
                 style={styles.counterBtn}
                 onClick={() => setTicketCount(prev => Math.max(1, prev - 1))}
               >
                 -
               </button>
               <span style={styles.countText}>{ticketCount}</span>
-              <button 
+              <button
                 style={styles.counterBtn}
                 onClick={() => setTicketCount(prev => prev + 1)}
               >
@@ -268,12 +280,12 @@ const Makepayment = () => {
           {/* RIGHT: Summary & Payment */}
           <div style={styles.card}>
             <h3 style={styles.summaryTitle}>Summary</h3>
-            
+
             <div style={styles.summaryRow}>
-              <p style={styles.summaryLabel}>Subtotal ({ticketCount} items)</p>
+              <p style={styles.summaryLabel}>Subtotal ({ticketCount} item{ticketCount > 1 ? 's' : ''})</p>
               <p style={styles.summaryValue}>KES {totalCost.toLocaleString()}</p>
             </div>
-            
+
             <div style={styles.totalRow}>
               <p style={styles.summaryLabel} className='fw-bold'>Total</p>
               <p style={styles.totalValue}>KES {totalCost.toLocaleString()}</p>
@@ -281,7 +293,7 @@ const Makepayment = () => {
 
             <form onSubmit={handlesubmit}>
               <label style={styles.inputLabel}>M-PESA NUMBER</label>
-              <input 
+              <input
                 type="tel"
                 placeholder="0712 345 678"
                 style={styles.input}
@@ -292,8 +304,8 @@ const Makepayment = () => {
                 onBlur={(e) => e.target.style.borderColor = '#3a3a3a'}
               />
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 style={styles.payBtn}
                 onMouseOver={(e) => e.target.style.backgroundColor = '#e6b800'}
                 onMouseOut={(e) => e.target.style.backgroundColor = '#f5c518'}

@@ -1,15 +1,73 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from './CartContext';
 import Footer from './Footer';
+import axios from 'axios';
+import Loader from './Loader';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart } = useCart();
   const navigate = useNavigate();
   const img_url = "https://vanessawambui.alwaysdata.net/static/images/";
 
-  // Calculate totals
+  const [number, setNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
   const subtotal = cartItems.reduce((acc, item) => acc + (item.product_cost * item.quantity), 0);
+
+  const handlePayment = async () => {
+    if (!number) {
+      setError("Please enter your M-Pesa number.");
+      return;
+    }
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      setError("Please log in to complete your purchase.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      // Step 1: Trigger M-Pesa payment for total amount
+      const formdata = new FormData();
+      formdata.append("phone", number);
+      formdata.append("amount", subtotal);
+
+      const response = await axios.post(
+        "https://vanessawambui.alwaysdata.net/api/mpesa_payment",
+        formdata
+      );
+
+      // Step 2: Book a ticket for each cart item
+      for (const item of cartItems) {
+        const ticketData = new FormData();
+        ticketData.append("user_id", user.user_id);
+        ticketData.append("product_id", item.product_id);
+        ticketData.append("product_name", item.product_name);
+        ticketData.append("product_date", item.product_date || "");
+        ticketData.append("amount_paid", item.product_cost * item.quantity);
+        ticketData.append("phone", number);
+        ticketData.append("quantity", item.quantity);
+
+        await axios.post(
+          "https://vanessawambui.alwaysdata.net/api/book_ticket",
+          ticketData
+        );
+      }
+
+      setLoading(false);
+      setSuccess(response.data.message);
+    } catch (err) {
+      setLoading(false);
+      setError(err.message);
+    }
+  };
 
   const styles = {
     pageBg: { backgroundColor: '#0d0d0d', minHeight: '100vh', padding: '40px 20px' },
@@ -35,7 +93,11 @@ const Cart = () => {
     summaryValue: { color: '#fff', fontSize: '15px', fontWeight: '600', margin: '0' },
     totalRow: { display: 'flex', justifyContent: 'space-between', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #2a2a2a' },
     totalValue: { color: '#f5c518', fontSize: '24px', fontWeight: '800', margin: '0' },
-    payBtn: { backgroundColor: '#f5c518', color: '#000', border: 'none', borderRadius: '8px', padding: '16px', width: '100%', fontSize: '16px', fontWeight: '700', cursor: 'pointer', marginTop: '30px' },
+    inputLabel: { color: '#888', fontSize: '12px', fontWeight: '600', letterSpacing: '1px', display: 'block', marginBottom: '8px', marginTop: '24px' },
+    input: { backgroundColor: '#2a2a2a', border: '1px solid #3a3a3a', color: '#fff', borderRadius: '8px', padding: '14px 16px', width: '100%', fontSize: '16px', outline: 'none', boxSizing: 'border-box' },
+    payBtn: { backgroundColor: '#f5c518', color: '#000', border: 'none', borderRadius: '8px', padding: '16px', width: '100%', fontSize: '16px', fontWeight: '700', cursor: 'pointer', marginTop: '20px' },
+    successMsg: { color: '#4caf50', fontSize: '14px', textAlign: 'center', marginTop: '15px', marginBottom: '0' },
+    errorMsg: { color: '#f44336', fontSize: '14px', textAlign: 'center', marginTop: '15px', marginBottom: '0' },
     emptyMsg: { color: '#888', textAlign: 'center', marginTop: '50px', fontSize: '18px' }
   };
 
@@ -62,48 +124,64 @@ const Cart = () => {
           <h1 style={styles.title}>Your Cart</h1>
         </div>
 
+        {loading && <Loader />}
+
         <div style={styles.grid}>
           {/* LEFT: Cart Items */}
           <div>
             {cartItems.map((item) => (
-  <div style={styles.card} key={item.uniqueId}>
-    <div style={styles.itemFlex}>
-      <img src={img_url + item.product_photo} alt={item.product_name} style={styles.img} />
-      <div style={styles.itemDetails}>
-        <h3 style={styles.itemTitle}>{item.product_name}</h3>
-        <p style={styles.itemBasePrice}>KES {item.product_cost} / ticket</p>
-        
-        <div style={styles.counterContainer}>
-          <button style={styles.counterBtn} onClick={() => updateQuantity(item.uniqueId, item.quantity - 1)}>-</button>
-          <span style={styles.countText}>{item.quantity}</span>
-          <button style={styles.counterBtn} onClick={() => updateQuantity(item.uniqueId, item.quantity + 1)}>+</button>
-        </div>
-        <button style={styles.deleteBtn} onClick={() => removeFromCart(item.uniqueId)}>Remove Item</button>
-      </div>
-    </div>
-  </div>
-))}
+              <div style={styles.card} key={item.uniqueId}>
+                <div style={styles.itemFlex}>
+                  <img src={img_url + item.product_photo} alt={item.product_name} style={styles.img} />
+                  <div style={styles.itemDetails}>
+                    <h3 style={styles.itemTitle}>{item.product_name}</h3>
+                    <p style={styles.itemBasePrice}>KES {item.product_cost} / ticket</p>
+                    <div style={styles.counterContainer}>
+                      <button style={styles.counterBtn} onClick={() => updateQuantity(item.uniqueId, item.quantity - 1)}>-</button>
+                      <span style={styles.countText}>{item.quantity}</span>
+                      <button style={styles.counterBtn} onClick={() => updateQuantity(item.uniqueId, item.quantity + 1)}>+</button>
+                    </div>
+                    <button style={styles.deleteBtn} onClick={() => removeFromCart(item.uniqueId)}>Remove Item</button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* RIGHT: Summary */}
+          {/* RIGHT: Summary + Payment */}
           <div style={styles.summaryCard}>
             <h3 style={styles.summaryTitle}>Summary</h3>
+
             <div style={styles.summaryRow}>
-              <p style={styles.summaryLabel}>Subtotal ({cartItems.length} items)</p>
+              <p style={styles.summaryLabel}>Subtotal ({cartItems.length} item{cartItems.length > 1 ? 's' : ''})</p>
               <p style={styles.summaryValue}>KES {subtotal.toLocaleString()}</p>
             </div>
+
             <div style={styles.totalRow}>
               <p style={styles.summaryLabel} className='fw-bold'>Total</p>
               <p style={styles.totalValue}>KES {subtotal.toLocaleString()}</p>
             </div>
-            
-            <button 
+
+            {/* M-Pesa Input */}
+            <label style={styles.inputLabel}>M-PESA NUMBER</label>
+            <input
+              type="tel"
+              placeholder="0712 345 678"
+              style={styles.input}
+              value={number}
+              onChange={(e) => setNumber(e.target.value)}
+              onFocus={(e) => e.target.style.borderColor = '#f5c518'}
+              onBlur={(e) => e.target.style.borderColor = '#3a3a3a'}
+            />
+
+            {success && <p style={styles.successMsg}>{success}</p>}
+            {error && <p style={styles.errorMsg}>{error}</p>}
+
+            <button
               style={styles.payBtn}
               onMouseOver={(e) => e.target.style.backgroundColor = '#e6b800'}
               onMouseOut={(e) => e.target.style.backgroundColor = '#f5c518'}
-              // Note: If paying for multiple items at once, you'll need to adjust your backend API to accept an array of products. 
-              // For now, this links back to the single M-Pesa payment flow.
-              onClick={() => alert("To pay for all items, your backend API needs to accept a cart array. For now, buy items individually.")}
+              onClick={handlePayment}
             >
               Pay with M-Pesa
             </button>

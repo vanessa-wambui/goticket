@@ -16,6 +16,7 @@ import { CartProvider } from './components/CartContext';
 import Cart from './components/Cart';
 import Shop from './components/Shop';
 import Additem from './components/Additem';
+import MyActivity from './components/Myactivity';
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
             <Route path='/aboutus' element={<Aboutus />} />
             <Route path='/shop' element={<Shop/>} />
             <Route path='/additem' element={<Additem/>} />
+            <Route path='/myactivity' element={<MyActivity/>} />
             
             {/* 2. ADD THE NEW CART ROUTE */}
             <Route path='/cart' element={<Cart />} />
