@@ -1,5 +1,5 @@
 // Navbar.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "./CartContext";
 import "../css/Navbar.css";
@@ -12,13 +12,16 @@ const Navbar = () => {
   const [passcode, setPasscode] = useState("");
   const [error, setError] = useState("");
   const [targetPath, setTargetPath] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("user"));
 
   const location = useLocation();
   const navigate = useNavigate();
   const { totalItems } = useCart();
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const isLoggedIn = !!user;
+  // Re-check login state on every route change
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("user"));
+  }, [location]);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -41,18 +44,25 @@ const Navbar = () => {
     }
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setIsOpen(false);
+    navigate("/");
+  };
+
   const navLinks = [
-    { name: "Home", path: "/", show: true },
-    { name: "Sign In", path: "/signin", show: !isLoggedIn },
-    { name: "Sign Up", path: "/signup", show: !isLoggedIn },
-    { name: "Our Shop", path: "/shop", show: true },
-    { name: "About Us", path: "/aboutus", show: true },
+    { name: "Home",        path: "/",          show: true },
+    { name: "Sign In",     path: "/signin",     show: !isLoggedIn },
+    { name: "Sign Up",     path: "/signup",     show: !isLoggedIn },
+    { name: "Our Shop",    path: "/shop",       show: true },
+    { name: "About Us",    path: "/aboutus",    show: true },
     { name: "My Activity", path: "/myactivity", show: isLoggedIn },
   ];
 
   const adminLinks = [
     { name: "Add Products", path: "/addproducts" },
-    { name: "Add Item", path: "/additem" },
+    { name: "Add Item",     path: "/additem" },
   ];
 
   const modalStyles = {
@@ -60,7 +70,7 @@ const Navbar = () => {
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: 'rgba(0,0,0,0.8)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 9999
+      zIndex: 9999,
     },
     modal: {
       backgroundColor: '#1a1a1a',
@@ -68,46 +78,46 @@ const Navbar = () => {
       borderRadius: '16px',
       padding: '36px',
       width: '320px',
-      textAlign: 'center'
+      textAlign: 'center',
     },
-    title: { color: '#fff', fontSize: '20px', fontWeight: '700', marginBottom: '8px' },
+    title:    { color: '#fff', fontSize: '20px', fontWeight: '700', marginBottom: '8px' },
     subtitle: { color: '#888', fontSize: '14px', marginBottom: '24px' },
     input: {
       backgroundColor: '#2a2a2a', border: '1px solid #3a3a3a',
       color: '#fff', borderRadius: '8px', padding: '12px 16px',
       width: '100%', fontSize: '18px', outline: 'none',
       textAlign: 'center', letterSpacing: '6px', marginBottom: '12px',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
     },
-    error: { color: '#f44336', fontSize: '13px', marginBottom: '12px' },
-    btnRow: { display: 'flex', gap: '10px', marginTop: '8px' },
+    error:      { color: '#f44336', fontSize: '13px', marginBottom: '12px' },
+    btnRow:     { display: 'flex', gap: '10px', marginTop: '8px' },
     confirmBtn: {
       flex: 1, backgroundColor: '#f5c518', color: '#000',
       border: 'none', borderRadius: '8px', padding: '12px',
-      fontSize: '15px', fontWeight: '700', cursor: 'pointer'
+      fontSize: '15px', fontWeight: '700', cursor: 'pointer',
     },
     cancelBtn: {
       flex: 1, backgroundColor: 'transparent', color: '#888',
       border: '1px solid #333', borderRadius: '8px', padding: '12px',
-      fontSize: '15px', cursor: 'pointer'
-    }
+      fontSize: '15px', cursor: 'pointer',
+    },
   };
 
   return (
     <>
-      <nav className="navbar" style={{ backgroundColor: '#111', borderBottom: '1px solid #2a2a2a', position: 'sticky', top: '0', zIndex: '1000' }}>
+      <nav className="navbar">
         <div className="nav-container">
 
           {/* GoTicket Logo */}
-          <div className="logo" style={{ fontSize: '24px', fontWeight: 'bold' }}>
-            <Link to="/" style={{ color: '#fff', textDecoration: 'none' }}>
-              Go<span style={{ color: '#f5c518' }}>Ticket</span>
+          <div className="logo">
+            <Link to="/">
+              Go<span>Ticket</span>
             </Link>
           </div>
 
           <div className={`nav-links ${isOpen ? "open" : ""}`}>
 
-            {/* Regular Nav Links */}
+            {/* Regular nav links */}
             {navLinks
               .filter((link) => link.show)
               .map((link) => (
@@ -116,41 +126,27 @@ const Navbar = () => {
                   to={link.path}
                   className={location.pathname === link.path ? "active" : ""}
                   onClick={() => setIsOpen(false)}
-                  style={{
-                    color: location.pathname === link.path ? '#f5c518' : '#ccc',
-                    textDecoration: 'none',
-                    transition: 'color 0.3s ease'
-                  }}
                 >
                   {link.name}
                 </Link>
               ))}
 
-            {/* Admin Links — visible to ALL, passcode required on click */}
-            {adminLinks.map((link) => (
+            {/* Admin links — logged in only, passcode required */}
+            {isLoggedIn && adminLinks.map((link) => (
               <button
                 key={link.path}
                 onClick={() => handleAdminClick(link.path)}
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: location.pathname === link.path ? '#f5c518' : '#ccc',
-                  fontSize: '14px', padding: '0', transition: 'color 0.3s ease',
-                  fontFamily: 'inherit'
-                }}
               >
                 {link.name}
               </button>
             ))}
 
-            {/* Cart Icon — only for logged in users */}
+            {/* Cart icon — logged in only */}
             {isLoggedIn && (
               <Link
                 to="/cart"
+                className="cart-link"
                 onClick={() => setIsOpen(false)}
-                style={{
-                  position: 'relative', display: 'flex',
-                  alignItems: 'center', textDecoration: 'none', marginLeft: '10px'
-                }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" viewBox="0 0 24 24">
                   <path d="M10 19.5c0 .829-.672 1.5-1.5 1.5s-1.5-.671-1.5-1.5c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5zm3.5-1.5c-.828 0-1.5.671-1.5 1.5s.672 1.5 1.5 1.5 1.5-.671 1.5-1.5c0-.828-.672-1.5-1.5-1.5zm1.336-5l1.977-7h-16.813l2.938 7h11.898zm4.969-10l-3.432 12h-12.597l-.839 2h13.239l-.575 2h-13.601l-4-9h-3.5v-2h4.433l1.147-2.614 3.42-1.386h12.4z"/>
@@ -162,7 +158,7 @@ const Navbar = () => {
                     fontSize: '11px', fontWeight: '800',
                     width: '20px', height: '20px', borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    border: '2px solid #111'
+                    border: '2px solid #111',
                   }}>
                     {totalItems}
                   </span>
@@ -170,19 +166,26 @@ const Navbar = () => {
               </Link>
             )}
 
+            {/* Sign Out — logged in only */}
+            {isLoggedIn && (
+              <button className="signout-btn" onClick={handleSignOut}>
+                Sign Out
+              </button>
+            )}
+
           </div>
 
-          {/* Hamburger Menu */}
+          {/* Hamburger */}
           <div className="hamburger" onClick={toggleMenu}>
-            <span className={`bar ${isOpen ? "animate-bar1" : ""}`} style={{ backgroundColor: '#fff' }}></span>
-            <span className={`bar ${isOpen ? "animate-bar2" : ""}`} style={{ backgroundColor: '#fff' }}></span>
-            <span className={`bar ${isOpen ? "animate-bar3" : ""}`} style={{ backgroundColor: '#fff' }}></span>
+            <span className={`bar ${isOpen ? "animate-bar1" : ""}`}></span>
+            <span className={`bar ${isOpen ? "animate-bar2" : ""}`}></span>
+            <span className={`bar ${isOpen ? "animate-bar3" : ""}`}></span>
           </div>
 
         </div>
       </nav>
 
-      {/* 🔐 Passcode Modal */}
+      {/* 🔐 Admin Passcode Modal */}
       {showModal && (
         <div style={modalStyles.overlay}>
           <div style={modalStyles.modal}>

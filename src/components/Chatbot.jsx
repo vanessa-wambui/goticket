@@ -67,7 +67,6 @@ const keywordData = [
 const quickReplies = [
   "Book a ticket 🎟️",
   "Event details 📅",
-  "Payment help 💳",
   "My tickets 🎫",
   "Contact support 🆘",
 ];

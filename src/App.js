@@ -17,7 +17,7 @@ import Additem from './components/Additem';
 import MyActivity from './components/Myactivity';
 import MakeOrderPayment from './components/MakeOrderPayment';
 
-// ── Guard: logged-in users only ──────────────────────────────
+// Guard: logged-in users only
 const ProtectedRoute = ({ children }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   if (!user) return <Navigate to="/signin" replace />;
@@ -32,29 +32,29 @@ function App() {
           <Navbar />
           <Routes>
 
-            {/* ── Public ── */}
-            <Route path='/' element={<Getproducts />} />
-            <Route path='/signin' element={<Signin />} />
-            <Route path='/signup' element={<Signup />} />
-            <Route path='/shop' element={<Shop />} />
+            {/* Public */}
+            <Route path='/'        element={<Getproducts />} />
+            <Route path='/signin'  element={<Signin />} />
+            <Route path='/signup'  element={<Signup />} />
+            <Route path='/shop'    element={<Shop />} />
             <Route path='/aboutus' element={<Aboutus />} />
 
-            {/* ── Protected (must be logged in) ── */}
-            <Route path='/makepayment' element={<ProtectedRoute><Makepayment /></ProtectedRoute>} />
+            {/* Protected — must be logged in */}
+            <Route path='/makepayment'      element={<ProtectedRoute><Makepayment /></ProtectedRoute>} />
             <Route path='/makeorderpayment' element={<ProtectedRoute><MakeOrderPayment /></ProtectedRoute>} />
-            <Route path='/cart' element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-            <Route path='/myactivity' element={<ProtectedRoute><MyActivity /></ProtectedRoute>} />
+            <Route path='/cart'             element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path='/myactivity'       element={<ProtectedRoute><MyActivity /></ProtectedRoute>} />
 
-            {/* ── Admin (passcode protected via Navbar modal) ── */}
-            <Route path='/addproducts' element={<Addproducts />} />
-            <Route path='/additem' element={<Additem />} />
+            {/* Admin — must be logged in + passcode via Navbar modal */}
+            <Route path='/addproducts' element={<ProtectedRoute><Addproducts /></ProtectedRoute>} />
+            <Route path='/additem'     element={<ProtectedRoute><Additem /></ProtectedRoute>} />
 
             <Route path='*' element={<Notfound />} />
           </Routes>
         </div>
       </Router>
     </CartProvider>
-  )
+  );
 }
 
 export default App;

@@ -295,7 +295,7 @@ const Makepayment = () => {
               <label style={styles.inputLabel}>M-PESA NUMBER</label>
               <input
                 type="tel"
-                placeholder="0712 345 678"
+                placeholder="254XXXXXXXX"
                 style={styles.input}
                 required
                 value={number}

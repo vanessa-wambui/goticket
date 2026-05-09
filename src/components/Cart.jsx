@@ -166,7 +166,7 @@ const Cart = () => {
             <label style={styles.inputLabel}>M-PESA NUMBER</label>
             <input
               type="tel"
-              placeholder="0712 345 678"
+              placeholder="254XXXXXXXXX"
               style={styles.input}
               value={number}
               onChange={(e) => setNumber(e.target.value)}
